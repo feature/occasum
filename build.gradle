@@ -1,0 +1,40 @@
+group = 'pw.stamina.occasum'
+version '1.0.0-SNAPSHOT'
+
+subprojects {
+    group = rootProject.group
+
+    apply plugin: 'java-library'
+    apply plugin: 'maven'
+
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+        options.encoding = 'UTF-8'
+    }
+
+    ext {
+        junit_jupiter_version = '5.0.1'
+        mockito_version = '2.11.0'
+    }
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        api 'javax.inject:javax.inject:1'
+
+        testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
+        testImplementation "org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_jupiter_version"
+        testImplementation "org.mockito:mockito-core:$mockito_version"
+
+        //TODO: Temporary
+        testImplementation 'name.falgout.jeffrey.testing.junit5:mockito-extension:1.0.0'
+
+        // To avoid compiler warnings about @API annotations in JUnit code
+        testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
+    }
+}

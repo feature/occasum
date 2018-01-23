@@ -1,0 +1,4 @@
+rootProject.name = 'occasum'
+
+include 'occasum-core',
+        'occasum-json'
