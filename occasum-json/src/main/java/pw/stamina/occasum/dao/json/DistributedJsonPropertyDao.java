@@ -60,7 +60,7 @@ public final class DistributedJsonPropertyDao extends JsonPropertyDao {
     @Override
     public void save(PropertyHandle handle) throws IOException {
         PropertyNode rootNode = propertyLocatorService.findRootNode(handle)
-                .orElseThrow(createNoPropertiesFoundForHandleException(handle));
+                .orElseThrow(createPropertiesNotFoundForHandleException(handle));
 
         save(handle, rootNode);
     }
@@ -116,7 +116,7 @@ public final class DistributedJsonPropertyDao extends JsonPropertyDao {
     @Override
     public Iterable<Exception> load(PropertyHandle handle) {
         PropertyNode rootNode = propertyLocatorService.findRootNode(handle)
-                .orElseThrow(createNoPropertiesFoundForHandleException(handle));
+                .orElseThrow(createPropertiesNotFoundForHandleException(handle));
 
         Path sourcePath = resolveRelativeJsonPath(handle.getId());
         return loadFromPath(rootNode, sourcePath);
@@ -151,7 +151,7 @@ public final class DistributedJsonPropertyDao extends JsonPropertyDao {
         return rootDirectory.resolve(path + JSON_FILE_EXTENSION);
     }
 
-    private static Supplier<IllegalArgumentException> createNoPropertiesFoundForHandleException(PropertyHandle handle) {
+    private static Supplier<IllegalArgumentException> createPropertiesNotFoundForHandleException(PropertyHandle handle) {
         return () -> new IllegalArgumentException("the specified handle does not have " +
                 "any properties registered to it. Handle id: " + handle.getId());
     }

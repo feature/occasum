@@ -78,7 +78,7 @@ final class JsonLoadingPropertyNodeVisitor extends AbstractPropertyNodeVisitor {
         return new JsonLoadingPropertyNodeVisitor(childElement, exceptions);
     }
 
-    public List<Exception> getExceptions() {
+    List<Exception> getExceptions() {
         return exceptions;
     }
 }
