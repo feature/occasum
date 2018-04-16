@@ -8,6 +8,6 @@ ext {
 dependencies {
     api project(":occasum-core")
 
-    implementation "com.google.code.gson:gson:$gson_version"
+    compileOnly "com.google.code.gson:gson:$gson_version"
     testImplementation "com.google.jimfs:jimfs:$jimfs_version"
 }
