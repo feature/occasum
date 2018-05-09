@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
-import pw.stamina.occasum.PropertyHandle;
 import pw.stamina.occasum.node.PropertyNode;
 import pw.stamina.occasum.properties.Property;
 

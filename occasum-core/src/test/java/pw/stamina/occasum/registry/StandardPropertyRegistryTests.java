@@ -3,7 +3,6 @@ package pw.stamina.occasum.registry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import pw.stamina.occasum.PropertyHandle;
 import pw.stamina.occasum.node.PropertyNode;
 import pw.stamina.occasum.node.factory.PropertyNodeFactory;
 import pw.stamina.occasum.properties.Property;

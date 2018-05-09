@@ -1,7 +1,6 @@
 package pw.stamina.occasum.properties.selective;
 
 import org.junit.jupiter.api.*;
-import pw.stamina.occasum.Named;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
