@@ -9,7 +9,6 @@ import pw.stamina.occasum.scan.field.model.Parent
 import pw.stamina.occasum.scan.field.model.Properties
 import pw.stamina.occasum.scan.result.InstructionBasedPropertyScanResult
 import pw.stamina.occasum.scan.result.PropertyScanResult
-import java.util.function.Consumer
 
 //TODO: @Extract - pulls properties out of a nested scan
 //TODO: @Export - exports properties to the
@@ -59,7 +58,7 @@ class FieldPropertyScanningStrategy private constructor(
                     }
 
                     if (value is PropertiesContainer) {
-                        value.forEach(Consumer<Property> { registeringTo.property(it) })
+                        value.forEach { registeringTo.property(it) }
                     } else {
                         scanAndPopulate(value, registeringTo)
                     }

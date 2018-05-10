@@ -7,7 +7,7 @@ import java.util.ArrayList
 import java.util.Collections
 import java.util.Objects
 
-abstract class AbstractCollectionProperty<T, R : Collection<T>> protected constructor(
+abstract class AbstractCollectionProperty<T, R : MutableCollection<T>> protected constructor(
         name: String,
         override val elements: R,
         private val adapter: CollectionPropertyAdapter<T>)

@@ -1,25 +1,30 @@
 package pw.stamina.occasum.properties.primitives
 
 import pw.stamina.occasum.properties.AbstractProperty
+import pw.stamina.occasum.properties.PropertyParseException
 import pw.stamina.occasum.properties.primitives.clamp.IntClamp
 import pw.stamina.occasum.properties.traits.Incremental
-import pw.stamina.occasum.properties.PropertyParseException
 
-class IntProperty internal constructor(name: String, value: Int, private val clamp: IntClamp, private val increaseValue: Int) : AbstractProperty(name), Incremental {
-    private var value: Int = 0
+class IntProperty internal constructor(
+        name: String,
+        value: Int,
+        private val clamp: IntClamp,
+        private val increaseValue: Int)
+    : AbstractProperty(name), Incremental {
+
+    private var value: Int
     private val defaultValue: Int
 
     override val isDefault: Boolean
         get() = value == defaultValue
 
     override val valueAsString: String
-        get() = Integer.toString(value)
+        get() = value.toString()
 
     override val defaultValueAsString: String
-        get() = Integer.toString(defaultValue)
+        get() = defaultValue.toString()
 
     init {
-
         val clampedValue = clamp.clamp(value)
 
         this.value = clampedValue
@@ -36,13 +41,12 @@ class IntProperty internal constructor(name: String, value: Int, private val cla
 
     @Throws(PropertyParseException::class)
     override fun parseAndSet(input: String) {
-        try {
-            val newValue = Integer.parseInt(input)
-            set(newValue)
-        } catch (e: NumberFormatException) {
-            throw PropertyParseException(e, input)
-        }
+        val newValue = input.toIntOrNull()
 
+        //TODO Error message
+        newValue ?: throw PropertyParseException("", input)
+
+        set(newValue)
     }
 
     override fun reset() {

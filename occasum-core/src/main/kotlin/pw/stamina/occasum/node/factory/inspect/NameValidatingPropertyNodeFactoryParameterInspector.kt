@@ -2,6 +2,7 @@ package pw.stamina.occasum.node.factory.inspect
 
 import pw.stamina.occasum.Named
 import pw.stamina.occasum.PropertyHandle
+import pw.stamina.occasum.dao.PropertyDao
 import pw.stamina.occasum.node.PropertyNode
 import pw.stamina.occasum.properties.Property
 
@@ -23,7 +24,7 @@ internal class NameValidatingPropertyNodeFactoryParameterInspector : PropertyNod
     private fun validatePropertyNodeName(name: String) {
         Named.validateName(name)
 
-        if (name == "value") {
+        if (PropertyDao.RESERVED_SERIALIZED_VALUE_NAME == name) {
             throw IllegalArgumentException("the name 'value' is reserved for serialization purposes")
         }
     }

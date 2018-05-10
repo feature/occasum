@@ -1,37 +1,25 @@
 package pw.stamina.occasum.dao.json
 
 import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
+import pw.stamina.occasum.dao.PropertyDao
 import pw.stamina.occasum.node.PropertyNode
-import pw.stamina.occasum.node.visit.AbstractPropertyNodeVisitor
 import pw.stamina.occasum.node.visit.PropertyNodeVisitor
 import pw.stamina.occasum.properties.PropertyParseException
-
-import java.util.ArrayList
-import java.util.Optional
+import java.util.*
 
 internal class JsonLoadingPropertyNodeVisitor private constructor(
         private val element: JsonElement,
-        exceptions: List<Exception>)
+        private val exceptions: MutableList<Exception>)
     : AbstractPropertyNodeVisitor() {
-
-    private val exceptions: MutableList<Exception>
 
     constructor(element: JsonElement) : this(element, ArrayList<Exception>())
 
-    init {
-        this.exceptions = exceptions
-    }
-
     override fun visitNode(node: PropertyNode) {
-        if (!node.hasProperty()) {
-            return
-        }
+        val property = node.property ?: return
 
         findPropertyValueFromElement().ifPresent { value ->
             try {
-                node.property.parseAndSet(value)
+                property.parseAndSet(value)
             } catch (e: PropertyParseException) {
                 exceptions.add(e)
             }
@@ -45,7 +33,7 @@ internal class JsonLoadingPropertyNodeVisitor private constructor(
 
         if (element.isJsonObject) {
             val `object` = element.asJsonObject
-            val name = JSON_OBJECT_PROPERTY_VALUE_NAME
+            val name = PropertyDao.RESERVED_SERIALIZED_VALUE_NAME
 
             if (`object`.has(name)) {
                 val value = `object`.getAsJsonPrimitive(name)
@@ -74,9 +62,5 @@ internal class JsonLoadingPropertyNodeVisitor private constructor(
 
     fun getExceptions(): List<Exception> {
         return exceptions
-    }
-
-    companion object {
-        private val JSON_OBJECT_PROPERTY_VALUE_NAME = "value"
     }
 }

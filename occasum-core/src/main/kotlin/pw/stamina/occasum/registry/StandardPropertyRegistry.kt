@@ -6,7 +6,6 @@ import pw.stamina.occasum.node.factory.PropertyNodeFactory
 import pw.stamina.occasum.node.visit.PropertyRegisterCleanupPropertyNodeVisitor
 import pw.stamina.occasum.properties.Property
 import java.util.*
-import java.util.function.Consumer
 import javax.inject.Inject
 
 class StandardPropertyRegistry @Inject
@@ -24,7 +23,7 @@ internal constructor(private val factory: PropertyNodeFactory) : PropertyRegistr
 
     override fun registerAll(handle: PropertyHandle, properties: Iterable<Property>) {
         val root = findOrCreateRootNode(handle)
-        properties.forEach(Consumer<Property> { root.property(it) })
+        properties.forEach { root.property(it) }
     }
 
     //TODO: Make absolutely sure this works as intended
@@ -42,13 +41,12 @@ internal constructor(private val factory: PropertyNodeFactory) : PropertyRegistr
     }
 
     override fun unregister(node: PropertyNode) {
-        if (node.hasParent()) {
-            val parent = node.parent
-            parent.removeChild(node)
+        val parent = node.parent
+
+        if (parent == null) {
+            properties.remove(node.handle)
         } else {
-            //TODO: Why is this illegal?
-            //TODO: Property exception message
-            throw IllegalStateException()
+            parent.removeChild(node)
         }
     }
 

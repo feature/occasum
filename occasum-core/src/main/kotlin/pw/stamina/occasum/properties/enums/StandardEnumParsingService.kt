@@ -7,12 +7,9 @@ internal class StandardEnumParsingService<T : Enum<T>>(enumClass: Class<T>) : Ab
     @Throws(PropertyParseException::class)
     override fun parse(input: String): T {
         try {
-            return Enum.valueOf<T>(enumClass, input)
-        } catch (e: NullPointerException) {
-            throw PropertyParseException(e, input)
+            return java.lang.Enum.valueOf<T>(enumClass, input)
         } catch (e: IllegalArgumentException) {
             throw PropertyParseException(e, input)
         }
-
     }
 }

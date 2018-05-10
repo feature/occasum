@@ -19,24 +19,12 @@ interface PropertyNode : Named {
      * @throws IllegalStateException if this method is invoked, but this
      * node is not holding any [Property].
      */
-    val property: Property
+    val property: Property?
 
     //TODO: Throw illegal state exception if hasParent returns false
-    val parent: PropertyNode
+    val parent: PropertyNode?
 
-    /**
-     * Indicates if this node is holding a [property][Property].
-     * The return value of this method should not change.
-     *
-     * @return <tt>true</tt> if this node holds a [Property]
-     */
-    fun hasProperty(): Boolean
-
-    fun hasParent(): Boolean
-
-    fun hasChildren(): Boolean
-
-    fun findChildren(): List<PropertyNode>
+    val children: List<PropertyNode>?
 
     fun property(handle: PropertyHandle, property: Property): PropertyNode
 
@@ -59,7 +47,7 @@ interface PropertyNode : Named {
      * or an [Optional.empty] Optional if no node
      * matched the specified id.
      */
-    fun find(id: String): PropertyNode?
+    operator fun get(id: String): PropertyNode?
 
     /**
      * As part of the visitor pattern this method accepts a

@@ -12,23 +12,17 @@ interface Named {
 
         //TODO Doc
         fun validateName(name: String): String {
-            if (name.isEmpty()) {
-                throw IllegalArgumentException("name cannot be empty")
-            } else if (name.contains(".")) {
-                throw IllegalArgumentException("name may not contain periods ('.')")
-            }
+            require(name.isNotBlank()) { "name cannot be blank" }
+            require(!name.contains(".")) { "name may not contain periods ('.')" }
 
             return name
         }
 
         //TODO Doc
         fun createIdFromName(name: String): String {
-            var id = name
-
-            id = id.toLowerCase(Locale.ROOT)
-            id = id.replace("(\\s|_)+".toRegex(), "_")
-
-            return id
+            return name
+                    .toLowerCase(Locale.ROOT)
+                    .replace("(\\s|_)+".toRegex(), "_")
         }
     }
 }

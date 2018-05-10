@@ -1,12 +1,12 @@
 package pw.stamina.occasum.node
 
+import pw.stamina.occasum.PropertyHandle
 import pw.stamina.occasum.node.factory.AbstractPropertyNodeFactory
 import pw.stamina.occasum.properties.Property
 
 import javax.inject.Inject
 
-class StandardPropertyNodeFactory @Inject
-internal constructor() : AbstractPropertyNodeFactory() {
+class StandardPropertyNodeFactory @Inject internal constructor() : AbstractPropertyNodeFactory() {
 
     override fun createRoot(handle: PropertyHandle): PropertyNode {
         return RootPropertyNode(this, handle)

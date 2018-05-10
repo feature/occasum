@@ -7,9 +7,7 @@ internal class CaseInsensitiveEnumParsingService<T : Enum<T>>(enumClass: Class<T
 
     @Throws(PropertyParseException::class)
     override fun parse(input: String): T {
-        val constants = enumClass.enumConstants
-
-        for (constant in constants) {
+        for (constant in enumConstants) {
             if (constant.name.equals(input, ignoreCase = true)) {
                 return constant
             }

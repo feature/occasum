@@ -1,6 +1,7 @@
 package pw.stamina.occasum.dao.json
 
 import com.google.gson.*
+import pw.stamina.occasum.dao.PropertyDao
 import pw.stamina.occasum.node.PropertyNode
 
 import java.lang.reflect.Type
@@ -9,34 +10,39 @@ internal class PropertyNodeJsonSerializer : JsonSerializer<PropertyNode> {
 
     //TODO: Clean this up boi
     override fun serialize(node: PropertyNode, typeOfSrc: Type, context: JsonSerializationContext): JsonElement? {
-        val hasChildren = node.hasChildren()
+        val children = node.children
+        val property = node.property
+
         var serializedProperty: JsonElement? = null
 
-        if (node.hasProperty()) {
-            serializedProperty = context.serialize(node.property)
+        if (property != null) {
+            serializedProperty = context.serialize(property)
 
-            if (!hasChildren) {
+            if (children == null) {
                 return serializedProperty
             }
         }
 
-        if (hasChildren) {
+        if (children != null) {
             val serialized = JsonObject()
 
             if (serializedProperty != null) {
-                serialized.add("value", serializedProperty)
+                serialized.add(PropertyDao.RESERVED_SERIALIZED_VALUE_NAME, serializedProperty)
             }
 
-            serializeAndAddChildren(node, serialized, context)
+            serializeChildren(children, context).forEach { (child, serializedChild) ->
+                serialized.add(child.id, serializedChild)
+            }
+
             return serialized
         }
 
         return JsonNull.INSTANCE
     }
 
-    private fun serializeAndAddChildren(node: PropertyNode,
-                                        serialized: JsonObject,
-                                        context: JsonSerializationContext) {
-        node.findChildren().forEach { child -> serialized.add(child.id, context.serialize(child)) }
+    private fun serializeChildren(children: List<PropertyNode>,
+                                  context: JsonSerializationContext):
+            List<Pair<PropertyNode, JsonElement>> {
+        return children.map { child -> child to context.serialize(child) }
     }
 }

@@ -15,7 +15,10 @@ import java.util.*
  * @see SelectiveProperty.builder
 </T> */
 //TODO: Choose between using Named#getName and Named#getId
-class SelectiveProperty<T : Named> internal constructor(name: String, value: T) : ParameterizedProperty<T>(name, value) {
+class SelectiveProperty<T : Named> internal constructor(
+        name: String, value: T)
+    : ParameterizedProperty<T>(name, value) {
+
     private val options = createNewOptionsMap<T>()
 
     init {
@@ -70,7 +73,7 @@ class SelectiveProperty<T : Named> internal constructor(name: String, value: T) 
      */
     @Throws(IllegalArgumentException::class)
     fun addOption(option: T) {
-        val key = option.getName()
+        val key = option.name
 
         if (options.containsKey(key)) {
             throw IllegalArgumentException(
@@ -97,17 +100,11 @@ class SelectiveProperty<T : Named> internal constructor(name: String, value: T) 
      * throws an exception while adding an option from the specified `options`
      */
     @Throws(IllegalArgumentException::class)
-    fun addAll(options: Iterable<T>) {
-        options.forEach(Consumer<T> { this.addOption(it) })
-    }
+    fun addAll(options: Iterable<T>) = options.forEach { this.addOption(it) }
 
     @Throws(IllegalArgumentException::class)
     fun removeOption(option: T) {
-        if (option === default) {
-            throw IllegalArgumentException(
-                    "the default value specified for this property cannot be removed as an option")
-        }
-
+        require(option !== default) { "the default value specified for this property cannot be removed as an option" }
         removeOptionAndResetIfSelectedWasRemoved(option)
     }
 
@@ -136,11 +133,11 @@ class SelectiveProperty<T : Named> internal constructor(name: String, value: T) 
         }
 
         fun <T : Named> from(name: String, selected: T): SelectiveProperty<T> {
-            return SelectiveProperty.builder<T>(name).selected(selected).build()
+            return SelectiveProperty.builder(name, selected).build()
         }
 
-        fun <T : Named> builder(name: String): SelectivePropertyBuilder<T> {
-            return SelectivePropertyBuilder<T>(name)
+        fun <T : Named> builder(name: String, selected: T): SelectivePropertyBuilder<T> {
+            return SelectivePropertyBuilder(name, selected);
         }
     }
 }

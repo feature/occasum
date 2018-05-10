@@ -6,6 +6,7 @@ import pw.stamina.occasum.properties.Property
 import java.util.*
 
 internal class StandardPropertyNodeInstructionList : PropertyNodeInstructionList {
+
     private val instructions: MutableList<PropertyNodeInstruction>
     private val nestedInstructions: MutableMap<String, PropertyNodeInstructionList>
 
@@ -19,7 +20,6 @@ internal class StandardPropertyNodeInstructionList : PropertyNodeInstructionList
     }
 
     override fun property(handle: PropertyHandle, property: Property) {
-        //Null handle is permitted
         instructions.add(PropertyPropertyNodeInstruction(handle, property))
     }
 

@@ -1,7 +1,6 @@
 package pw.stamina.occasum.dao.json
 
 import com.google.gson.JsonObject
-import com.google.gson.JsonParseException
 import pw.stamina.occasum.PropertyHandle
 import pw.stamina.occasum.node.PropertyNode
 import pw.stamina.occasum.registry.PropertyLocatorService
@@ -25,17 +24,35 @@ import javax.inject.Named
 class DistributedJsonPropertyDao @Inject internal constructor(
         propertyLocatorService: PropertyLocatorService,
         @Named("property.dao") private val rootDirectory: Path)
-    : JsonPropertyDao(propertyLocatorService) {
+    : JsonPropertyDao(propertyLocatorService, rootDirectory) {
 
-    @Throws(IOException::class)
-    override fun saveAll(): Iterable<Exception> {
+    override fun resolveHandlePath(handle: PropertyHandle) = resolveRelativeJsonPath(handle.id)
+
+    @Throws(Exception::class)
+    override fun save(handle: PropertyHandle, destination: Path) {
+        val rootNode = propertyLocatorService.findRootNode(handle)
+        rootNode ?: throw createPropertiesNotFoundForHandleException(handle)
+
+        save(rootNode, destination)
+    }
+
+    @Throws(Exception::class)
+    private fun save(rootNode: PropertyNode, destination: Path) {
+        val children = rootNode.children ?: return
+
         Files.createDirectories(rootDirectory)
+
+        val serializedPropertiesAsBytes = serializePropertiesToBytes(children)
+        writeBytesToLocation(serializedPropertiesAsBytes, destination)
+    }
+
+    override fun saveAll(destination: Path): Iterable<Exception> {
         val exceptions = ArrayList<Exception>()
 
-        propertyLocatorService.findAllRootNodes()
-                .forEach { handle, rootNode ->
+        propertyLocatorService.findAllRootNodes().keys
+                .forEach { handle ->
                     try {
-                        save(handle, rootNode)
+                        save(handle)
                     } catch (e: IOException) {
                         exceptions.add(e)
                     }
@@ -44,90 +61,59 @@ class DistributedJsonPropertyDao @Inject internal constructor(
         return exceptions
     }
 
-    @Throws(IOException::class)
-    override fun save(handle: PropertyHandle) {
+    @Throws(Exception::class)
+    override fun load(handle: PropertyHandle, destination: Path) {
         val rootNode = propertyLocatorService.findRootNode(handle)
-
         rootNode ?: throw createPropertiesNotFoundForHandleException(handle)
 
-        save(handle, rootNode)
+        return loadFromPath(rootNode, destination)
     }
 
-    @Throws(IOException::class)
-    private fun save(handle: PropertyHandle, rootNode: PropertyNode) {
-        if (!rootNode.hasChildren()) {
-            return
-        }
-
-        Files.createDirectories(rootDirectory)
-
-        val serializedPropertiesBytes = serializePropertiesToBytes(rootNode)
-        val destination = resolveRelativeJsonPath(handle.id)
-
-        writeBytesToLocation(serializedPropertiesBytes, destination)
-    }
-
-    @Throws(IOException::class)
-    override fun loadAll(): Iterable<Exception> {
-        if (!Files.exists(rootDirectory)) {
+    override fun loadAll(source: Path): Iterable<Exception> {
+        if (!Files.exists(source)) {
             return emptyList()
         }
 
         val exceptions = ArrayList<Exception>()
 
         try {
-            Files.newDirectoryStream(rootDirectory, "*.json").use { directory ->
+            Files.newDirectoryStream(source, "*.json").use { directory ->
                 directory.forEach { path ->
                     val handleId = getHandleIdFromJsonFilePath(path)
                     val rootNode = propertyLocatorService.findRootNode(handleId)
 
                     rootNode ?: return@forEach
 
-                    loadFromPath(rootNode, path).forEach { exceptions.add(it) }
+                    try {
+                        loadFromPath(rootNode, path)
+                    } catch (e: Exception) {
+                        exceptions.add(e)
+                    }
                 }
             }
         } catch (e: DirectoryIteratorException) {
-            exceptions.add(e)
+            return listOf(e)
         }
 
         return exceptions
     }
 
-    override fun load(handle: PropertyHandle): Iterable<Exception> {
-        val rootNode = propertyLocatorService.findRootNode(handle)
-
-        rootNode ?: throw createPropertiesNotFoundForHandleException(handle)
-
-        val sourcePath = resolveRelativeJsonPath(handle.id)
-        return loadFromPath(rootNode, sourcePath)
-    }
-
-    private fun loadFromPath(rootNode: PropertyNode, sourcePath: Path): Iterable<Exception> {
-        if (!rootNode.hasChildren()) {
-            return emptyList()
-        }
+    @Throws(Exception::class)
+    private fun loadFromPath(rootNode: PropertyNode, sourcePath: Path) {
+        rootNode.children ?: return
 
         if (Files.notExists(sourcePath)) {
-            return emptyList()
+            return
         }
 
-        try {
-            val serialized = JsonPropertyDao.readSerializeJsonFromLocation(sourcePath)
+        val serialized = JsonPropertyDao.readSerializeJsonFromLocation(sourcePath)
 
-            if (!serialized.isJsonObject) {
-                return emptyList()
-            }
-
-            val loadingVisitor = JsonLoadingPropertyNodeVisitor(serialized)
-            rootNode.accept(loadingVisitor)
-
-            return loadingVisitor.exceptions
-        } catch (e: IOException) {
-            return setOf<Exception>(e)
-        } catch (e: JsonParseException) {
-            return setOf<Exception>(e)
+        if (!serialized.isJsonObject) {
+            return
         }
 
+        val loadingVisitor = JsonLoadingPropertyNodeVisitor(serialized)
+        rootNode.accept(loadingVisitor)
     }
 
     private fun resolveRelativeJsonPath(path: String): Path {
@@ -138,8 +124,7 @@ class DistributedJsonPropertyDao @Inject internal constructor(
         private const val JSON_FILE_EXTENSION = ".json"
         private const val JSON_FILE_EXTENSION_LENGTH = JSON_FILE_EXTENSION.length
 
-        private fun serializePropertiesToBytes(rootNode: PropertyNode): ByteArray {
-            val properties = rootNode.findChildren()
+        private fun serializePropertiesToBytes(properties: List<PropertyNode>): ByteArray {
             val serializedProperties = serializeProperties(properties)
             return serializedProperties.toByteArray()
         }

@@ -9,13 +9,14 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
+import pw.stamina.occasum.dao.PropertyDao
 import pw.stamina.occasum.properties.Property
 
 @ExtendWith(MockitoExtension::class)
 internal class PropertyJsonSerializerTests {
 
     @Mock private lateinit var property: Property
-    private val valueAsString = "value"
+    private val valueAsString = PropertyDao.RESERVED_SERIALIZED_VALUE_NAME
 
     private lateinit var serializer: PropertyJsonSerializer
 

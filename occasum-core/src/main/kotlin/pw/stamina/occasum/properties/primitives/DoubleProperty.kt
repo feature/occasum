@@ -5,32 +5,34 @@ import pw.stamina.occasum.properties.PropertyParseException
 import pw.stamina.occasum.properties.primitives.clamp.DoubleClamp
 import pw.stamina.occasum.properties.traits.Incremental
 
-class DoubleProperty internal constructor(name: String, value: Double, private val clamp: DoubleClamp, private val increaseValue: Double) : AbstractProperty(name), Incremental {
-    private var value: Double = 0.toDouble()
+class DoubleProperty internal constructor(
+        name: String,
+        value: Double,
+        private val clamp: DoubleClamp,
+        private val increaseValue: Double)
+    : AbstractProperty(name), Incremental {
+
+    private var value: Double
     private val defaultValue: Double
 
-    override val isDefault: Boolean
-        get() = value == defaultValue
-
-    override val valueAsString: String
-        get() = java.lang.Double.toString(value)
-
-    override val defaultValueAsString: String
-        get() = java.lang.Double.toString(defaultValue)
-
     init {
-
         val clampedValue = clamp.clamp(value)
 
         this.value = clampedValue
         this.defaultValue = clampedValue
     }
 
+    override val isDefault: Boolean
+        get() = value == defaultValue
+
+    override val valueAsString: String
+        get() = value.toString()
+
+    override val defaultValueAsString: String = defaultValue.toString()
+
     @Throws(IllegalArgumentException::class)
     fun set(value: Double) {
-        if (!java.lang.Double.isFinite(value)) {
-            throw IllegalArgumentException("value is not finite")
-        }
+        require(value.isFinite()) { "value is not finite" }
 
         this.value = clamp.clamp(value)
     }
@@ -41,15 +43,12 @@ class DoubleProperty internal constructor(name: String, value: Double, private v
 
     @Throws(PropertyParseException::class)
     override fun parseAndSet(input: String) {
-        try {
-            val newValue = java.lang.Double.parseDouble(input)
-            set(newValue)
-        } catch (e: NullPointerException) {
-            throw PropertyParseException(e, input)
-        } catch (e: NumberFormatException) {
-            throw PropertyParseException(e, input)
-        }
+        val newValue = input.toDoubleOrNull()
 
+        //TODO Error message
+        newValue ?: throw PropertyParseException("", input)
+
+        set(newValue)
     }
 
     override fun reset() {

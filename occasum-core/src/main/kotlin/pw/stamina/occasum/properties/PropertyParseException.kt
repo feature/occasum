@@ -14,11 +14,4 @@ class PropertyParseException : Exception {
     constructor(cause: Throwable, input: String) : super(cause) {
         this.input = input
     }
-
-    companion object {
-
-        fun nullInput(): PropertyParseException {
-            return PropertyParseException("input is null", null)
-        }
-    }
 }

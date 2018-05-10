@@ -3,14 +3,10 @@ package pw.stamina.occasum.properties.primitives
 import pw.stamina.occasum.properties.primitives.clamp.DoubleClamp
 
 class DoublePropertyBuilder internal constructor(private val name: String) {
-    private var value: Double = 0.toDouble()
-    private var increaseValue: Double = 0.toDouble()
-    private var clamp: DoubleClamp? = null
+    private var value = DEFAULT_VALUE
+    private var increaseValue = DEFAULT_INCREASE_VALUE
 
-    init {
-        this.clamp = DoubleClamp.none()
-        this.increaseValue = DEFAULT_INCREASE_VALUE
-    }
+    private var clamp = DoubleClamp.none()
 
     fun value(value: Double): DoublePropertyBuilder {
         this.value = value
@@ -36,9 +32,7 @@ class DoublePropertyBuilder internal constructor(private val name: String) {
     }
 
     private fun requireNoClampHasBeenSet() {
-        if (clamp !== DoubleClamp.none()) {
-            throw IllegalStateException("a range has already been set for this builder")
-        }
+        require(clamp === DoubleClamp.none()) { "a range has already been set for this builder" }
     }
 
     fun increase(increaseValue: Double): DoublePropertyBuilder {
@@ -46,11 +40,10 @@ class DoublePropertyBuilder internal constructor(private val name: String) {
         return this
     }
 
-    fun build(): DoubleProperty {
-        return DoubleProperty(name, value, clamp!!, increaseValue)
-    }
+    fun build() = DoubleProperty(name, value, clamp, increaseValue)
 
     companion object {
-        private val DEFAULT_INCREASE_VALUE = 0.1
+        private const val DEFAULT_VALUE = 0.0
+        private const val DEFAULT_INCREASE_VALUE = 0.1
     }
 }

@@ -3,14 +3,10 @@ package pw.stamina.occasum.properties.primitives
 import pw.stamina.occasum.properties.primitives.clamp.IntClamp
 
 class IntPropertyBuilder internal constructor(private val name: String) {
-    private var value: Int = 0
-    private var clamp: IntClamp? = null
-    private var increaseValue: Int = 0
+    private var value = DEFAULT_VALUE
+    private var increaseValue = DEFAULT_INCREASE_VALUE
 
-    init {
-        this.clamp = IntClamp.none()
-        this.increaseValue = DEFAULT_INCREASE_VALUE
-    }
+    private var clamp = IntClamp.none()
 
     fun value(value: Int): IntPropertyBuilder {
         this.value = value
@@ -36,9 +32,7 @@ class IntPropertyBuilder internal constructor(private val name: String) {
     }
 
     private fun requireNoClampHasBeenSet() {
-        if (clamp !== IntClamp.none()) {
-            throw IllegalStateException("a clamp has already been set for this builder")
-        }
+        require(clamp === IntClamp.none()) { "a range has already been set for this builder" }
     }
 
     fun increase(increaseValue: Int): IntPropertyBuilder {
@@ -46,11 +40,10 @@ class IntPropertyBuilder internal constructor(private val name: String) {
         return this
     }
 
-    fun build(): IntProperty {
-        return IntProperty(name, value, clamp!!, increaseValue)
-    }
+    fun build() = IntProperty(name, value, clamp, increaseValue)
 
     companion object {
-        private val DEFAULT_INCREASE_VALUE = 1
+        private const val DEFAULT_VALUE = 0
+        private const val DEFAULT_INCREASE_VALUE = 1
     }
 }

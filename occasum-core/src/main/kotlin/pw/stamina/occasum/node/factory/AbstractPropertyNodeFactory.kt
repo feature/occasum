@@ -7,6 +7,7 @@ import pw.stamina.occasum.properties.Property
 import java.util.*
 
 abstract class AbstractPropertyNodeFactory protected constructor() : PropertyNodeFactory {
+
     private val inspectors: MutableList<PropertyNodeFactoryParameterInspector> = ArrayList()
 
     override fun root(handle: PropertyHandle): PropertyNode {

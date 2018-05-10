@@ -4,14 +4,10 @@ import pw.stamina.occasum.node.PropertyNode
 import java.io.PrintStream
 import java.util.stream.Stream
 
-private const val DEFAULT_INDENTION = 0
-private const val INDENTION_PRINTING_OFFSET = 1L
-private const val INDENTION_LEVEL_INCREASE = 1
-
 class PrettyPrintingPropertyNodeVisitor private constructor(
         private val out: PrintStream,
-        private val indention: Int)
-    : AbstractPropertyNodeVisitor() {
+        private val indention: Int
+) : PropertyNodeVisitor {
 
     constructor(out: PrintStream) : this(out, DEFAULT_INDENTION)
 
@@ -38,18 +34,24 @@ class PrettyPrintingPropertyNodeVisitor private constructor(
     }
 
     private fun addPropertyValueIfPresent(node: PropertyNode) {
-        val property = node.property//TODO ?: return
+        val property = node.property ?: return
 
         out.print(":")
         out.print(property.valueAsString)
     }
 
-    override fun createChildVisitor(childNode: PropertyNode): PropertyNodeVisitor {
+    override fun visitChildNode(childNode: PropertyNode): PropertyNodeVisitor {
         return withIncreasedIndention()
     }
 
     private fun withIncreasedIndention(): PrettyPrintingPropertyNodeVisitor {
         val increasedIndention = indention + INDENTION_LEVEL_INCREASE
         return PrettyPrintingPropertyNodeVisitor(out, increasedIndention)
+    }
+
+    companion object {
+        private const val DEFAULT_INDENTION = 0
+        private const val INDENTION_PRINTING_OFFSET = 1L
+        private const val INDENTION_LEVEL_INCREASE = 1
     }
 }

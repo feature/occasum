@@ -5,31 +5,20 @@ import pw.stamina.occasum.node.factory.PropertyNodeFactory
 import pw.stamina.occasum.node.visit.PropertyNodeVisitor
 import pw.stamina.occasum.properties.Property
 
-import java.util.*
-import java.util.function.Predicate
+abstract class AbstractPropertyNode protected constructor(
+        private val factory: PropertyNodeFactory,
+        override val handle: PropertyHandle
+) : PropertyNode {
 
-abstract class AbstractPropertyNode protected constructor(private val factory: PropertyNodeFactory,
-                                                          override val handle: PropertyHandle) : PropertyNode {
-    private var children: MutableList<PropertyNode>? = null
-
-    override fun hasChildren(): Boolean {
-        return children != null
-    }
-
-    override fun findChildren(): List<PropertyNode> {
-        return if (hasChildren()) {
-            Collections.unmodifiableList(children!!)
-        } else emptyList()
-
+    override val children: MutableList<PropertyNode> by lazy(LazyThreadSafetyMode.NONE) {
+        ArrayList<PropertyNode>()
     }
 
     override fun property(handle: PropertyHandle, property: Property): PropertyNode {
         val propertyId = property.id
 
-        if (find(propertyId).isPresent) {
-            throw IllegalArgumentException(
-                    "another node with the same id has " +
-                            "already been registered. Id: " + propertyId)
+        require(this[propertyId] == null) {
+            "another node with the same id ('$propertyId') has already been registered"
         }
 
         return add(factory.property(handle, this, property))
@@ -40,7 +29,7 @@ abstract class AbstractPropertyNode protected constructor(private val factory: P
     }
 
     override fun folder(handle: PropertyHandle, name: String): PropertyNode {
-        return find(name).orElseGet { add(factory.folder(handle, this, name)) }
+        return this[name] ?: add(factory.folder(handle, this, name))
     }
 
     override fun folder(name: String): PropertyNode {
@@ -48,52 +37,38 @@ abstract class AbstractPropertyNode protected constructor(private val factory: P
     }
 
     private fun add(node: PropertyNode): PropertyNode {
-        createChildrenIfAbsent()
-
-        children!!.add(node)
+        children.add(node)
         return node
     }
 
-    private fun createChildrenIfAbsent() {
-        if (!hasChildren()) {
-            children = ArrayList()
-        }
-    }
-
     override fun removeChild(node: PropertyNode) {
-        if (hasChildren() && children!!.remove(node)) {
+        if (children.remove(node)) {
             factory.notifyRemoval(node)
         }
     }
 
     override fun removeChild(id: String) {
-        find(id).ifPresent { this.removeChild(it) }
+        val child = this[id] ?: return
+        removeChild(child)
     }
 
-    override fun find(id: String): PropertyNode? {
-        return if (!hasChildren()) {
-            null
-        } else children!!.stream()
-                .filter(doesIdMatchIgnoreCase(id))
-                .findAny()
-
+    override operator fun get(id: String): PropertyNode? {
+        return children.find(doesIdMatchIgnoreCase(id))
     }
 
-    private fun doesIdMatchIgnoreCase(id: String): Predicate<PropertyNode> {
-        return Predicate { node -> node.id.equals(id, true) }
+    private fun doesIdMatchIgnoreCase(id: String): (PropertyNode) -> Boolean {
+        return { node -> node.id.equals(id, true) }
     }
 
     override fun accept(visitor: PropertyNodeVisitor) {
         visitor.visitNode(this)
-
-        if (hasChildren()) {
-            visitChildren(visitor)
-        }
+        visitChildren(visitor)
     }
 
     private fun visitChildren(visitor: PropertyNodeVisitor) {
-        children!!.forEach{ childNode -> visitor.visitChildNode(childNode)
-                .ifPresent { childNode.accept(it) } }
+        children.forEach { childNode ->
+            visitor.visitChildNode(childNode)?.let { childNode.accept(it) }
+        }
     }
 
     override fun toString(): String {

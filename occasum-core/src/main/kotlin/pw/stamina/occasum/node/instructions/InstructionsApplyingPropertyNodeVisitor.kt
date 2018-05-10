@@ -2,7 +2,6 @@ package pw.stamina.occasum.node.instructions
 
 import pw.stamina.occasum.node.PropertyNode
 import pw.stamina.occasum.node.visit.PropertyNodeVisitor
-import java.util.*
 
 class InstructionsApplyingPropertyNodeVisitor(private val instructions: PropertyNodeInstructionList) : PropertyNodeVisitor {
 
@@ -10,9 +9,9 @@ class InstructionsApplyingPropertyNodeVisitor(private val instructions: Property
         instructions.forEach { instruction -> instruction.apply(node) }
     }
 
-    override fun visitChildNode(childNode: PropertyNode): PropertyNodeVisitor {
+    override fun visitChildNode(childNode: PropertyNode): PropertyNodeVisitor? {
         val name = childNode.name
-        return instructions.findNestedInstructions(name)
-                .map { InstructionsApplyingPropertyNodeVisitor(it) }
+        //TODO
+        return instructions.findNestedInstructions(name)?.let { InstructionsApplyingPropertyNodeVisitor(it) }
     }
 }

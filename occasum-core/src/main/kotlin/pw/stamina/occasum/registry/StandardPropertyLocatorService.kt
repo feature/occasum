@@ -55,7 +55,7 @@ internal constructor(private val registry: PropertyRegistry) : PropertyLocatorSe
         var current = root
 
         for (pathSegment in pathSegments) {
-            val found = current.find(pathSegment)
+            val found = current.get(pathSegment)
 
             if (found.isPresent) {
                 current = found.get()

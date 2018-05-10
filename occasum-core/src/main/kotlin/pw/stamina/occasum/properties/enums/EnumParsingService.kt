@@ -4,7 +4,7 @@ import pw.stamina.occasum.properties.PropertyParseException
 
 interface EnumParsingService<T : Enum<T>> {
 
-    val enumConstants: Array<T>
+    val enumConstants: Array<out T>
 
     @Throws(PropertyParseException::class)
     fun parse(input: String): T

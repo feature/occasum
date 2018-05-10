@@ -10,30 +10,30 @@ interface PropertyNodeFactoryParameterInspector {
     fun inspectRoot(handle: PropertyHandle) {}
 
     fun inspectProperty(handle: PropertyHandle,
-                             parent: PropertyNode,
-                             property: Property) {
+                        parent: PropertyNode,
+                        property: Property) {
     }
 
     fun inspectFolder(handle: PropertyHandle,
-                           parent: PropertyNode,
-                           name: String) {
+                      parent: PropertyNode,
+                      name: String) {
     }
 
     fun inspectNotifyRemoval(node: PropertyNode) {}
 
     companion object {
 
-        fun nameValidating(): PropertyNodeFactoryParameterInspector {
+        fun validateName(): PropertyNodeFactoryParameterInspector {
             return NameValidatingPropertyNodeFactoryParameterInspector()
         }
 
-        fun duplicatedPropertyDetecting(): PropertyNodeFactoryParameterInspector {
-            return DuplicatedPropertyDetectingPropertyNodeFactoryParameterInspector()
+        fun detectDuplicateProperties(): PropertyNodeFactoryParameterInspector {
+            return DuplicatePropertyDetectingPropertyNodeFactoryParameterInspector()
         }
 
         fun addStandardInspectors(factory: PropertyNodeFactory) {
-            factory.addInspector(nameValidating())
-            factory.addInspector(duplicatedPropertyDetecting())
+            factory.addInspector(validateName())
+            factory.addInspector(detectDuplicateProperties())
         }
     }
 }

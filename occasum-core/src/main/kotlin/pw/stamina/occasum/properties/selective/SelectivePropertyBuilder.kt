@@ -1,15 +1,11 @@
 package pw.stamina.occasum.properties.selective
 
-import java.util.HashSet
-import java.util.Objects
+import pw.stamina.occasum.Named
+import java.util.*
 
-class SelectivePropertyBuilder<T : Named> internal constructor(private val name: String) {
-    private val options: MutableSet<T>
-    private var selected: T? = null
+class SelectivePropertyBuilder<T : Named> internal constructor(private val name: String, private val selected: T) {
 
-    init {
-        this.options = HashSet()
-    }
+    private val options: MutableSet<T> = HashSet()
 
     /**
      * Sets the specified `selected` as the default value for the
@@ -20,10 +16,6 @@ class SelectivePropertyBuilder<T : Named> internal constructor(private val name:
      * @return this builder
      * @throws NullPointerException if the `selected` value is null
      */
-    fun selected(selected: T): SelectivePropertyBuilder<T> {
-        this.selected = selected
-        return this
-    }
 
     /**
      *
@@ -47,9 +39,9 @@ class SelectivePropertyBuilder<T : Named> internal constructor(private val name:
      * @throws IllegalStateException if the builder isn't satisfied
      */
     fun build(): SelectiveProperty<T> {
-        val selectiveProperty = SelectiveProperty<T>(name, selected)
+        val selectiveProperty = SelectiveProperty(name, selected)
 
-        options.forEach(Consumer<T> { selectiveProperty.addOption(it) })
+        options.forEach { selectiveProperty.addOption(it) }
 
         return selectiveProperty
     }

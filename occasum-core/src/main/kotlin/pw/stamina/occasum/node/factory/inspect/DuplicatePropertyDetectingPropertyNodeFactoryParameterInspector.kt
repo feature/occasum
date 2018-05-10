@@ -6,7 +6,8 @@ import pw.stamina.occasum.node.visit.PropertyNodeVisitor
 import pw.stamina.occasum.properties.Property
 import java.util.*
 
-internal class DuplicatedPropertyDetectingPropertyNodeFactoryParameterInspector : PropertyNodeFactoryParameterInspector {
+internal class DuplicatePropertyDetectingPropertyNodeFactoryParameterInspector : PropertyNodeFactoryParameterInspector {
+
     private val registeredProperties: MutableSet<Property> = createRegisteredPropertiesSet()
 
     override fun inspectProperty(handle: PropertyHandle, parent: PropertyNode, property: Property) {
@@ -30,10 +31,8 @@ internal class DuplicatedPropertyDetectingPropertyNodeFactoryParameterInspector 
     private inner class NotifyRemovalCleanupPropertyNodeVisitor : PropertyNodeVisitor {
 
         override fun visitNode(node: PropertyNode) {
-            if (node.hasProperty()) {
-                val property = node.property
-                registeredProperties.remove(property)
-            }
+            val property = node.property ?: return
+            registeredProperties.remove(property)
         }
     }
 }

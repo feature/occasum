@@ -11,8 +11,12 @@ import pw.stamina.occasum.registry.PropertyLocatorService
 import java.io.IOException
 import java.nio.file.Path
 
-abstract class JsonPropertyDao internal constructor(internal val propertyLocatorService: PropertyLocatorService) : AbstractFlatfilePropertyDao() {
-    companion object {
+abstract class JsonPropertyDao internal constructor(
+        internal val propertyLocatorService: PropertyLocatorService,
+        location: Path)
+    : AbstractFlatfilePropertyDao(location) {
+
+    protected companion object {
         internal val PROPERTY_DAO_GSON = GsonBuilder()
                 .registerTypeHierarchyAdapter(Property::class.java, PropertyJsonSerializer())
                 .registerTypeHierarchyAdapter(PropertyNode::class.java, PropertyNodeJsonSerializer())
@@ -21,7 +25,7 @@ abstract class JsonPropertyDao internal constructor(internal val propertyLocator
 
         @Throws(IOException::class, JsonParseException::class)
         internal fun readSerializeJsonFromLocation(location: Path): JsonElement {
-            val reader = AbstractFlatfilePropertyDao.Companion.readBytesFromLocation(location)
+            val reader = AbstractFlatfilePropertyDao.streamBytesFromLocation(location)
             val parser = JsonParser()
             return parser.parse(reader)
         }

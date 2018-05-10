@@ -15,15 +15,6 @@ import pw.stamina.occasum.properties.Property
 interface PropertyDao {
 
     /**
-     * Saves all the [properties][Property] for the specified `handle`.
-     *
-     * @param handle the handle
-     * @throws Exception if an exception occurred when saving the properties
-     */
-    @Throws(Exception::class)
-    fun save(handle: PropertyHandle)
-
-    /**
      * Saves all [properties][Property] handled by this DAO. An [Iterable]
      * of [Exception]s is returned, containing all the exceptions that caused
      * individual save operations to fail. This method may also throw a [Exception]
@@ -33,12 +24,23 @@ interface PropertyDao {
      * @return an [Iterable] of exceptions that caused individual save operations to fail
      * @throws Exception if an exception occurred that caused all save operations to fail
      */
-    @Throws(Exception::class)
     fun saveAll(): Iterable<Exception>
 
+    /**
+     * Saves all the [properties][Property] for the specified `handle`.
+     *
+     * @param handle the handle
+     * @throws Exception if an exception occurred when saving the properties
+     */
     @Throws(Exception::class)
-    fun load(handle: PropertyHandle): Iterable<Exception>
+    fun save(handle: PropertyHandle)
+
+    fun loadAll(): Iterable<Exception>
 
     @Throws(Exception::class)
-    fun loadAll(): Iterable<Exception>
+    fun load(handle: PropertyHandle)
+
+    companion object {
+        const val RESERVED_SERIALIZED_VALUE_NAME = "value"
+    }
 }
