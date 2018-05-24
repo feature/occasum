@@ -12,7 +12,7 @@ class StandardPropertyNodeFactory @Inject internal constructor() : AbstractPrope
         return RootPropertyNode(this, handle)
     }
 
-    override fun createProperty(handle: PropertyHandle, parent: PropertyNode, property: Property): PropertyNode {
+    override fun createProperty(handle: PropertyHandle, parent: PropertyNode, property: Property<*>): PropertyNode {
         return SimplePropertyNode(this, handle, parent, property)
     }
 

@@ -8,9 +8,9 @@ import java.util.*
 
 internal class DuplicatePropertyDetectingPropertyNodeFactoryParameterInspector : PropertyNodeFactoryParameterInspector {
 
-    private val registeredProperties: MutableSet<Property> = createRegisteredPropertiesSet()
+    private val registeredProperties: MutableSet<Property<*>> = createRegisteredPropertiesSet()
 
-    override fun inspectProperty(handle: PropertyHandle, parent: PropertyNode, property: Property) {
+    override fun inspectProperty(handle: PropertyHandle, parent: PropertyNode, property: Property<*>) {
         if (registeredProperties.contains(property)) {
             //TODO: Better error message
             throw IllegalArgumentException("that property has already been registered to another node")
@@ -24,7 +24,7 @@ internal class DuplicatePropertyDetectingPropertyNodeFactoryParameterInspector :
         node.accept(visitor)
     }
 
-    private fun createRegisteredPropertiesSet(): MutableSet<Property> {
+    private fun createRegisteredPropertiesSet(): MutableSet<Property<*>> {
         return Collections.newSetFromMap(IdentityHashMap())
     }
 

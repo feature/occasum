@@ -5,21 +5,22 @@ import java.util.*
 
 class StandardFieldLocatorService : FieldLocatorService {
 
-    override fun findAllFields(source: Any, ignorePredicate: FieldIgnorePredicate): List<Field> {
+    override fun findAllFields(source: Any, ignorePredicate: FieldIgnorePredicate): Collection<Field> {
         val fields = findAllFields(source.javaClass)
 
-        fields.removeIf(ignorePredicate)
-        fields.forEach { this.ensureAccessibility(it) }
+        val filteredFields = fields.filter(ignorePredicate)
+
+        filteredFields.forEach(this::ensureAccessibility)
 
         return fields
     }
 
-    private fun findAllFields(type: Class<*>?): MutableList<Field> {
-        var type = type
+    private fun findAllFields(type: Class<*>): Collection<Field> {
         val fields = ArrayList<Field>()
+        var type: Class<*>? = type
 
         while (type != null) {
-            fields.addAll(Arrays.asList(*type.declaredFields))
+            fields.addAll(type.declaredFields.toList())
             type = type.superclass
         }
 

@@ -12,7 +12,7 @@ interface PropertyNodeFactory {
 
     fun property(handle: PropertyHandle,
                  parent: PropertyNode,
-                 property: Property): PropertyNode
+                 property: Property<*>): PropertyNode
 
     fun folder(handle: PropertyHandle,
                parent: PropertyNode,

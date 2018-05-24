@@ -8,20 +8,22 @@ import pw.stamina.occasum.properties.Property
 import java.util.*
 import javax.inject.Inject
 
-class StandardPropertyRegistry @Inject
-internal constructor(private val factory: PropertyNodeFactory) : PropertyRegistry {
+class StandardPropertyRegistry @Inject internal constructor(
+        private val factory: PropertyNodeFactory
+) : PropertyRegistry {
+
     private val properties: MutableMap<PropertyHandle, PropertyNode>
 
     init {
         this.properties = IdentityHashMap<PropertyHandle, PropertyNode>()
     }
 
-    override fun register(handle: PropertyHandle, property: Property): PropertyNode {
+    override fun register(handle: PropertyHandle, property: Property<*>): PropertyNode {
         val root = findOrCreateRootNode(handle)
         return root.property(property)
     }
 
-    override fun registerAll(handle: PropertyHandle, properties: Iterable<Property>) {
+    override fun registerAll(handle: PropertyHandle, properties: Iterable<Property<*>>) {
         val root = findOrCreateRootNode(handle)
         properties.forEach { root.property(it) }
     }

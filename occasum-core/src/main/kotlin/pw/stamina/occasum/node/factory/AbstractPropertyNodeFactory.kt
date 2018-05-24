@@ -15,7 +15,7 @@ abstract class AbstractPropertyNodeFactory protected constructor() : PropertyNod
         return createRoot(handle)
     }
 
-    override fun property(handle: PropertyHandle, parent: PropertyNode, property: Property): PropertyNode {
+    override fun property(handle: PropertyHandle, parent: PropertyNode, property: Property<*>): PropertyNode {
         inspectors.forEach { inspector -> inspector.inspectProperty(handle, parent, property) }
         return createProperty(handle, parent, property)
     }
@@ -35,7 +35,7 @@ abstract class AbstractPropertyNodeFactory protected constructor() : PropertyNod
 
     protected abstract fun createRoot(handle: PropertyHandle): PropertyNode
 
-    protected abstract fun createProperty(handle: PropertyHandle, parent: PropertyNode, property: Property): PropertyNode
+    protected abstract fun createProperty(handle: PropertyHandle, parent: PropertyNode, property: Property<*>): PropertyNode
 
     protected abstract fun createFolder(handle: PropertyHandle, parent: PropertyNode, name: String): PropertyNode
 }

@@ -19,24 +19,28 @@ internal class StandardPropertyNodeInstructionList : PropertyNodeInstructionList
         return nestedInstructions[name]
     }
 
-    override fun property(handle: PropertyHandle, property: Property) {
+    override fun property(handle: PropertyHandle, property: Property<*>) {
         instructions.add(PropertyPropertyNodeInstruction(handle, property))
     }
 
-    override fun property(property: Property) {
-        property(null, property)
+    override fun property(property: Property<*>) {
+        instructions.add(PropertyPropertyNodeInstruction(null, property))
     }
 
     override fun folder(handle: PropertyHandle, name: String): PropertyNodeInstructionList {
+        return addFolderInstruction(handle, name)
+    }
+
+    override fun folder(name: String): PropertyNodeInstructionList {
+        return addFolderInstruction(null, name)
+    }
+
+    private fun addFolderInstruction(handle: PropertyHandle?, name: String): PropertyNodeInstructionList {
         if (nestedInstructions.containsKey(name)) {
             instructions.add(FolderPropertyNodeInstruction(handle, name))
         }
 
         return nestedInstructions.computeIfAbsent(name) { StandardPropertyNodeInstructionList() }
-    }
-
-    override fun folder(name: String): PropertyNodeInstructionList {
-        return folder(null, name)
     }
 
     override fun iterator(): Iterator<PropertyNodeInstruction> {

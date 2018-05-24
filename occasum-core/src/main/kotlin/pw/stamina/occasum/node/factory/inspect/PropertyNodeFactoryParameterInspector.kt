@@ -11,7 +11,7 @@ interface PropertyNodeFactoryParameterInspector {
 
     fun inspectProperty(handle: PropertyHandle,
                         parent: PropertyNode,
-                        property: Property) {
+                        property: Property<*>) {
     }
 
     fun inspectFolder(handle: PropertyHandle,

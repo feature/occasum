@@ -11,6 +11,7 @@ class InstructionsApplyingPropertyNodeVisitor(private val instructions: Property
 
     override fun visitChildNode(childNode: PropertyNode): PropertyNodeVisitor? {
         val name = childNode.name
+
         //TODO
         return instructions.findNestedInstructions(name)?.let { InstructionsApplyingPropertyNodeVisitor(it) }
     }

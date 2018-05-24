@@ -37,7 +37,7 @@ class FieldPropertyScanningStrategy private constructor(
                 val value = field.get(source) ?: return@forEach
 
                 if (Property::class.java.isAssignableFrom(field.type)) {
-                    val property = value as Property
+                    val property = value as Property<*>
                     var registeringTo = instructions
 
                     if (field.isAnnotationPresent(Parent::class.java)) {
@@ -71,7 +71,11 @@ class FieldPropertyScanningStrategy private constructor(
 
     private fun findOrCreateFolder(instructions: PropertyNodeInstructionList, path: String): PropertyNodeInstructionList {
         var instructions = instructions
-        val pathSegments = path.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+
+        val pathSegments = path
+                .split("\\.".toRegex())
+                .dropLastWhile(String::isEmpty)
+                .toTypedArray()
 
         for (pathSegment in pathSegments) {
             instructions = instructions.folder(pathSegment)
@@ -83,7 +87,7 @@ class FieldPropertyScanningStrategy private constructor(
     companion object {
         private val STANDARD = FieldPropertyScanningStrategy(
                 FieldLocatorService.standard(),
-                FieldIgnorePredicate.standard())
+                FieldIgnorePredicates.standard())
 
         fun standard(): PropertyScanningStrategy {
             return STANDARD

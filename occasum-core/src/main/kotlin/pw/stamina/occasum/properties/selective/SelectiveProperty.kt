@@ -1,9 +1,8 @@
 package pw.stamina.occasum.properties.selective
 
 import pw.stamina.occasum.Named
-import pw.stamina.occasum.properties.ParameterizedProperty
+import pw.stamina.occasum.properties.AbstractProperty
 import pw.stamina.occasum.properties.PropertyParseException
-
 import java.util.*
 
 /**
@@ -11,21 +10,34 @@ import java.util.*
  * [named][Named] options. Options names are case insensitive.
  *
  * @param <T> the type of [Named] options
- *
- * @see SelectiveProperty.builder
 </T> */
 //TODO: Choose between using Named#getName and Named#getId
-class SelectiveProperty<T : Named> internal constructor(
-        name: String, value: T)
-    : ParameterizedProperty<T>(name, value) {
+class SelectiveProperty<T : Named> (
+        name: String,
+        value: T,
+        additionalOptions: Iterable<T> = emptyList()
+) : AbstractProperty<T>(name) {
+
+    override var value: T = value
+        set(value) {
+            if (!options.containsValue(value)) {
+                throw IllegalArgumentException("the specified value is not a registered option")
+            }
+
+            field = value
+        }
+
+    override val default: T = value
 
     private val options = createNewOptionsMap<T>()
 
     init {
         addOption(value)
+        addAll(additionalOptions)
     }
 
-    /**
+
+    /* TODO: Documentation for the set method
      * Changes the currently selected value for this property to the specified
      * `value`. If the specified `value` is not null and not a
      * registered option, an [IllegalArgumentException] is thrown.
@@ -34,21 +46,13 @@ class SelectiveProperty<T : Named> internal constructor(
      * @throws IllegalArgumentException if the specified `value` is not
      * null and is not a registered option
      */
-    @Throws(IllegalArgumentException::class)
-    override fun set(value: T) {
-        if (!options.containsValue(value)) {
-            throw IllegalArgumentException("the specified value is not a registered option")
-        }
-
-        super.set(value)
-    }
 
     @Throws(PropertyParseException::class)
     override fun parseAndSet(input: String) {
         val found = options[input]
 
         if (found != null) {
-            set(found)
+            value = found
             return
         }
 
@@ -100,7 +104,7 @@ class SelectiveProperty<T : Named> internal constructor(
      * throws an exception while adding an option from the specified `options`
      */
     @Throws(IllegalArgumentException::class)
-    fun addAll(options: Iterable<T>) = options.forEach { this.addOption(it) }
+    fun addAll(options: Iterable<T>) = options.forEach(this::addOption)
 
     @Throws(IllegalArgumentException::class)
     fun removeOption(option: T) {
@@ -118,8 +122,7 @@ class SelectiveProperty<T : Named> internal constructor(
     }
 
     private fun wasSelectedRemoved(removed: T): Boolean {
-        val selected = get()
-        return selected === removed
+        return value === removed
     }
 
     fun getOptions(): Collection<T> {
@@ -130,14 +133,6 @@ class SelectiveProperty<T : Named> internal constructor(
 
         private fun <T : Named> createNewOptionsMap(): NavigableMap<String, T> {
             return TreeMap(String.CASE_INSENSITIVE_ORDER)
-        }
-
-        fun <T : Named> from(name: String, selected: T): SelectiveProperty<T> {
-            return SelectiveProperty.builder(name, selected).build()
-        }
-
-        fun <T : Named> builder(name: String, selected: T): SelectivePropertyBuilder<T> {
-            return SelectivePropertyBuilder(name, selected);
         }
     }
 }

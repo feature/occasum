@@ -1,15 +1,13 @@
 package pw.stamina.occasum.properties
 
-class StringProperty protected constructor(name: String, value: String) : ParameterizedProperty<String>(name, value) {
+class StringProperty (
+        name: String,
+        override var value: String
+) : AbstractProperty<String>(name) {
 
-    override fun set(value: String) {
-
-        // TODO: Process String
-
-        super.set(value)
-    }
+    override val default = value
 
     override fun parseAndSet(input: String) {
-        set(input)
+        value = input
     }
 }

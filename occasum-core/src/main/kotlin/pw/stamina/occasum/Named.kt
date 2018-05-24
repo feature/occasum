@@ -13,7 +13,7 @@ interface Named {
         //TODO Doc
         fun validateName(name: String): String {
             require(name.isNotBlank()) { "name cannot be blank" }
-            require(!name.contains(".")) { "name may not contain periods ('.')" }
+            require(!name.contains('.')) { "name may not contain periods ('.')" }
 
             return name
         }

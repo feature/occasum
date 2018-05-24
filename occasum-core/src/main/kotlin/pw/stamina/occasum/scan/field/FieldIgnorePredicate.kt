@@ -3,36 +3,28 @@ package pw.stamina.occasum.scan.field
 import pw.stamina.occasum.scan.field.model.Ignore
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import java.util.function.Predicate
 
-interface FieldIgnorePredicate : Predicate<Field> {
+typealias FieldIgnorePredicate = (Field) -> Boolean
 
-    fun shouldIgnoreField(field: Field): Boolean
+object FieldIgnorePredicates {
 
-    override infix fun or(other: Predicate<in Field>): FieldIgnorePredicate {
-        return { test(it) || other.test(it) }
+    infix fun FieldIgnorePredicate.or(other: FieldIgnorePredicate): FieldIgnorePredicate {
+        return { field -> this(field) || other(field) }
     }
 
-    override fun test(field: Field): Boolean {
-        return shouldIgnoreField(field)
+    fun standard(): FieldIgnorePredicate {
+        return ifIgnored() or ifStatic() or ifNotFinal()
     }
 
-    companion object {
+    fun ifStatic(): FieldIgnorePredicate {
+        return { field -> Modifier.isStatic(field.modifiers) }
+    }
 
-        fun standard(): FieldIgnorePredicate {
-            return ifIgnored() or ifStatic() or ifNotFinal()
-        }
+    fun ifNotFinal(): FieldIgnorePredicate {
+        return { field -> !Modifier.isFinal(field.modifiers) }
+    }
 
-        fun ifStatic(): Predicate<Field> {
-            return { field -> Modifier.isStatic(field.getModifiers()) }
-        }
-
-        fun ifNotFinal(): FieldIgnorePredicate {
-            return { field -> !Modifier.isFinal(field.getModifiers()) }
-        }
-
-        fun ifIgnored(): FieldIgnorePredicate {
-            return { field -> field.isAnnotationPresent(Ignore::class.java) }
-        }
+    fun ifIgnored(): FieldIgnorePredicate {
+        return { field -> field.isAnnotationPresent(Ignore::class.java) }
     }
 }

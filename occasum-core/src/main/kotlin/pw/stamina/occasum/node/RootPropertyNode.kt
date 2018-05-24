@@ -13,7 +13,7 @@ internal class RootPropertyNode(
 
     override val id: String = handle.name
 
-    override val property: Property? = null
+    override val property: Property<*>? = null
 
     override val parent: PropertyNode? = null
 }

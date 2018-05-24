@@ -6,20 +6,12 @@ interface DoubleClamp {
 
     companion object {
 
-        fun min(min: Double): DoubleClamp {
-            return MinDoubleClamp(min)
-        }
+        fun min(min: Double): DoubleClamp = MinDoubleClamp(min)
 
-        fun max(max: Double): DoubleClamp {
-            return MaxDoubleClamp(max)
-        }
+        fun max(max: Double): DoubleClamp = MaxDoubleClamp(max)
 
-        fun range(min: Double, max: Double): DoubleClamp {
-            return RangeDoubleClamp(min, max)
-        }
+        fun range(min: Double, max: Double): DoubleClamp = RangeDoubleClamp(min, max)
 
-        fun none(): DoubleClamp {
-            return NoClamp.INSTANCE
-        }
+        fun none(): DoubleClamp = NoClamp
     }
 }

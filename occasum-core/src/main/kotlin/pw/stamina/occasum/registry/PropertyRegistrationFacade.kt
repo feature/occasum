@@ -4,17 +4,16 @@ import pw.stamina.occasum.PropertyHandle
 import pw.stamina.occasum.node.PropertyNode
 import pw.stamina.occasum.properties.Property
 import pw.stamina.occasum.scan.PropertyScanningStrategy
-import java.util.*
 import javax.inject.Inject
 
 class PropertyRegistrationFacade @Inject
 constructor(private val registry: PropertyRegistry) {
 
-    fun register(handle: PropertyHandle, property: Property): PropertyNode {
+    fun register(handle: PropertyHandle, property: Property<*>): PropertyNode {
         return registry.register(handle, property)
     }
 
-    fun registerAll(handle: PropertyHandle, properties: Iterable<Property>) {
+    fun registerAll(handle: PropertyHandle, properties: Iterable<Property<*>>) {
         registry.registerAll(handle, properties)
     }
 
@@ -34,7 +33,7 @@ constructor(private val registry: PropertyRegistry) {
 
     fun registerWithQuery(query: RegisterWithQuery) {
         val result = query.result
-        val node = query.nodeExtractor.apply(registry)
+        val node = query.nodeExtractor(registry)
 
         result.attach(node)
     }

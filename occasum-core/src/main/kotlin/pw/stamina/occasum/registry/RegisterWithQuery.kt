@@ -5,13 +5,11 @@ import pw.stamina.occasum.node.PropertyNode
 import pw.stamina.occasum.scan.PropertyScanningStrategy
 import pw.stamina.occasum.scan.result.PropertyScanResult
 
-import java.util.function.Function
-
 interface RegisterWithQuery {
 
     val result: PropertyScanResult
 
-    val nodeExtractor: Function<PropertyRegistry, PropertyNode>
+    val nodeExtractor: (PropertyRegistry) -> PropertyNode
 
     interface Builder {
 

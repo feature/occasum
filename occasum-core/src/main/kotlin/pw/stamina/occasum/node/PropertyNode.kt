@@ -19,16 +19,16 @@ interface PropertyNode : Named {
      * @throws IllegalStateException if this method is invoked, but this
      * node is not holding any [Property].
      */
-    val property: Property?
+    val property: Property<*>?
 
     //TODO: Throw illegal state exception if hasParent returns false
     val parent: PropertyNode?
 
     val children: List<PropertyNode>?
 
-    fun property(handle: PropertyHandle, property: Property): PropertyNode
+    fun property(handle: PropertyHandle, property: Property<*>): PropertyNode
 
-    fun property(property: Property): PropertyNode
+    fun property(property: Property<*>): PropertyNode
 
     fun folder(handle: PropertyHandle, name: String): PropertyNode
 

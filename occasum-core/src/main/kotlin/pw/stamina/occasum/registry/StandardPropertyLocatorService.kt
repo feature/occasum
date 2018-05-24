@@ -4,15 +4,16 @@ import pw.stamina.occasum.PropertyHandle
 import pw.stamina.occasum.node.PropertyNode
 import javax.inject.Inject
 
-class StandardPropertyLocatorService @Inject
-internal constructor(private val registry: PropertyRegistry) : PropertyLocatorService {
+class StandardPropertyLocatorService @Inject internal constructor(
+        private val registry: PropertyRegistry
+) : PropertyLocatorService {
 
     override fun findRootNode(handle: PropertyHandle): PropertyNode? {
         return registry.findRootNode(handle)
     }
 
     override fun findRootNode(handleId: String): PropertyNode? {
-        return findHandleById(handleId).flatMap { this.findRootNode(it) }
+        return findHandleById(handleId)?.let { findRootNode(it) }
     }
 
     override fun findAllRootNodes(): Map<PropertyHandle, PropertyNode> {
@@ -23,22 +24,19 @@ internal constructor(private val registry: PropertyRegistry) : PropertyLocatorSe
         val pathSegments = parseAndValidateSearchPath(path)
         val root = findRootNode(handle)
 
-        return root.map({ node -> findNodeByPath(node, pathSegments) })
+        return root?.let({ findNodeByPath(it, pathSegments) })
     }
 
     override fun findNode(handleId: String, path: String): PropertyNode? {
-        return findHandleById(handleId).flatMap { handle -> findNode(handle, path) }
+        return findHandleById(handleId)?.let { findNode(it, path) }
     }
 
     private fun findHandleById(id: String): PropertyHandle? {
-        return findAllRootNodes().entries.stream()
-                .filter(doesEntryHandleIdMatch(id))
-                .map<PropertyHandle> { it.key }
-                .findFirst()
+        return findAllRootNodes().keys.find(doesHandleIdMatch(id))
     }
 
-    private fun doesEntryHandleIdMatch(handleId: String): (Entry<PropertyHandle, *>) -> Boolean {
-        return { entry -> entry.key.getId().equalsIgnoreCase(handleId) }
+    private fun doesHandleIdMatch(handleId: String): (PropertyHandle) -> Boolean {
+        return { handle -> handle.id.equals(handleId, ignoreCase = true) }
     }
 
     private fun parseAndValidateSearchPath(path: String): Array<String> {
@@ -55,10 +53,10 @@ internal constructor(private val registry: PropertyRegistry) : PropertyLocatorSe
         var current = root
 
         for (pathSegment in pathSegments) {
-            val found = current.get(pathSegment)
+            val found = current[pathSegment]
 
-            if (found.isPresent) {
-                current = found.get()
+            if (found != null) {
+                current = found
             } else {
                 return null
             }

@@ -14,7 +14,7 @@ abstract class AbstractPropertyNode protected constructor(
         ArrayList<PropertyNode>()
     }
 
-    override fun property(handle: PropertyHandle, property: Property): PropertyNode {
+    override fun property(handle: PropertyHandle, property: Property<*>): PropertyNode {
         val propertyId = property.id
 
         require(this[propertyId] == null) {
@@ -24,7 +24,7 @@ abstract class AbstractPropertyNode protected constructor(
         return add(factory.property(handle, this, property))
     }
 
-    override fun property(property: Property): PropertyNode {
+    override fun property(property: Property<*>): PropertyNode {
         return property(handle, property)
     }
 

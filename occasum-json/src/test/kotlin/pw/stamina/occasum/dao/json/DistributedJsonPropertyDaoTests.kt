@@ -5,9 +5,11 @@ import com.google.common.jimfs.Jimfs
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
+import org.mockito.junit.jupiter.MockitoExtension
 import pw.stamina.occasum.PropertyHandle
 import pw.stamina.occasum.dao.PropertyDao
 import pw.stamina.occasum.node.PropertyNode
@@ -20,14 +22,13 @@ import pw.stamina.occasum.registry.PropertyLocatorService
 import java.nio.file.FileSystem
 import java.nio.file.Files
 
-//@ExtendWith(MockitoExtension.class)
 //TODO: Write better tests
+@ExtendWith(MockitoExtension::class)
 class DistributedJsonPropertyDaoTests {
 
-    @Mock
-    private lateinit var propertyLocator: PropertyLocatorService
-    @Mock
-    private lateinit var handle: PropertyHandle
+    @Mock private lateinit var propertyLocator: PropertyLocatorService
+    @Mock private lateinit var handle: PropertyHandle
+
     private lateinit var dao: PropertyDao
 
     @BeforeEach
@@ -44,14 +45,14 @@ class DistributedJsonPropertyDaoTests {
 
         val weNeedToGoDeeper = targeting.folder("nestmedaddy")
 
-        weNeedToGoDeeper.property(BooleanProperty.from("player", true))
-        weNeedToGoDeeper.property(BooleanProperty.from("animals", true))
-        weNeedToGoDeeper.property(BooleanProperty.from("monsters", true))
-        weNeedToGoDeeper.property(BooleanProperty.from("othershit", true))
+        weNeedToGoDeeper.property(BooleanProperty("player", true))
+        weNeedToGoDeeper.property(BooleanProperty("animals", true))
+        weNeedToGoDeeper.property(BooleanProperty("monsters", true))
+        weNeedToGoDeeper.property(BooleanProperty("othershit", true))
 
-        root.property(IntProperty.from("aps", 7))
-        root.property(DoubleProperty.from("reach", 3.7))
-        root.property(BooleanProperty.from("autoblock", false))
+        root.property(IntProperty("aps", 7))
+        root.property(DoubleProperty("reach", 3.7))
+        root.property(BooleanProperty("autoblock", false))
 
         `when`(propertyLocator.findRootNode(handle)).thenReturn(root)
         `when`<PropertyNode>(propertyLocator.findRootNode("Test")).thenReturn(root)
@@ -77,7 +78,11 @@ class DistributedJsonPropertyDaoTests {
         Files.createDirectories(savePath.parent)
         Files.write(savePath, SERIALIZED_JSON.toByteArray())
 
-        dao.load(handle).forEach { it.printStackTrace() }
+        try {
+            dao.load(handle)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         val visitor = PrettyPrintingPropertyNodeVisitor(System.out)
         propertyLocator.findRootNode(handle)?.apply { this.accept(visitor) }
@@ -97,7 +102,7 @@ class DistributedJsonPropertyDaoTests {
                 "  \"autoblock\": \"true\"\n" +
                 "}"
 
-        private var fileSystem: FileSystem? = null
+        private lateinit var fileSystem: FileSystem
 
         @BeforeAll
         internal fun setupFileSystem() {

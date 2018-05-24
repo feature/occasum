@@ -4,7 +4,7 @@ import java.lang.reflect.Field
 
 interface FieldLocatorService {
 
-    fun findAllFields(source: Any, ignorePredicate: FieldIgnorePredicate): List<Field>
+    fun findAllFields(source: Any, ignorePredicate: FieldIgnorePredicate): Collection<Field>
 
     companion object {
 

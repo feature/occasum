@@ -7,9 +7,9 @@ import pw.stamina.occasum.properties.Property
 
 interface PropertyRegistry {
 
-    fun register(handle: PropertyHandle, property: Property): PropertyNode
+    fun register(handle: PropertyHandle, property: Property<*>): PropertyNode
 
-    fun registerAll(handle: PropertyHandle, properties: Iterable<Property>)
+    fun registerAll(handle: PropertyHandle, properties: Iterable<Property<*>>)
 
     fun unregisterAll(handle: PropertyHandle)
 

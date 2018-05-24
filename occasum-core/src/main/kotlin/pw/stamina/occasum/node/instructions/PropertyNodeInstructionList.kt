@@ -7,9 +7,9 @@ interface PropertyNodeInstructionList : Iterable<PropertyNodeInstruction> {
 
     fun findNestedInstructions(name: String): PropertyNodeInstructionList?
 
-    fun property(handle: PropertyHandle, property: Property)
+    fun property(handle: PropertyHandle, property: Property<*>)
 
-    fun property(property: Property)
+    fun property(property: Property<*>)
 
     fun folder(handle: PropertyHandle, name: String): PropertyNodeInstructionList
 

@@ -6,20 +6,12 @@ interface IntClamp {
 
     companion object {
 
-        fun min(min: Int): IntClamp {
-            return MinIntClamp(min)
-        }
+        fun min(min: Int): IntClamp = MinIntClamp(min)
 
-        fun max(max: Int): IntClamp {
-            return MaxIntClamp(max)
-        }
+        fun max(max: Int): IntClamp = MaxIntClamp(max)
 
-        fun range(min: Int, max: Int): IntClamp {
-            return RangeIntClamp(min, max)
-        }
+        fun range(min: Int, max: Int): IntClamp = RangeIntClamp(min, max)
 
-        fun none(): IntClamp {
-            return NoClamp.INSTANCE
-        }
+        fun none(): IntClamp = NoClamp
     }
 }

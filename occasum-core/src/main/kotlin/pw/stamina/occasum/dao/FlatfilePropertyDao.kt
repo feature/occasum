@@ -15,4 +15,3 @@ interface FlatfilePropertyDao : PropertyDao {
     @Throws(Exception::class)
     fun load(handle: PropertyHandle, destination: Path)
 }
-

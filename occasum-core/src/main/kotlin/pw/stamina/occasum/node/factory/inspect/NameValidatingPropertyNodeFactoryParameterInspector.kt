@@ -12,7 +12,7 @@ internal class NameValidatingPropertyNodeFactoryParameterInspector : PropertyNod
         validatePropertyNodeName(handle.name)
     }
 
-    override fun inspectProperty(handle: PropertyHandle, parent: PropertyNode, property: Property) {
+    override fun inspectProperty(handle: PropertyHandle, parent: PropertyNode, property: Property<*>) {
         validatePropertyNodeName(property.name)
     }
 

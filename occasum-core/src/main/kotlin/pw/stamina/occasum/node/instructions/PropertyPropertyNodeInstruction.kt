@@ -6,8 +6,8 @@ import pw.stamina.occasum.properties.Property
 
 internal class PropertyPropertyNodeInstruction(
         private val handle: PropertyHandle?,
-        private val property: Property)
-    : PropertyNodeInstruction {
+        private val property: Property<*>
+) : PropertyNodeInstruction {
 
     override fun apply(node: PropertyNode) {
         if (handle != null) {

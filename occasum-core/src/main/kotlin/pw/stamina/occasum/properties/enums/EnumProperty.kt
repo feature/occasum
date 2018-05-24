@@ -1,19 +1,20 @@
 package pw.stamina.occasum.properties.enums
 
-import pw.stamina.occasum.properties.ParameterizedProperty
+import pw.stamina.occasum.properties.AbstractProperty
 import pw.stamina.occasum.properties.PropertyParseException
 import pw.stamina.occasum.properties.traits.Cyclable
-import java.util.function.Function
 
 class EnumProperty<T : Enum<T>> internal constructor(
         name: String,
-        value: T,
+        override var value: T,
         private val parsingService: EnumParsingService<T>)
-    : ParameterizedProperty<T>(name, value), Cyclable {
+    : AbstractProperty<T>(name), Cyclable {
+
+    override val default: T = value
 
     @Throws(PropertyParseException::class)
     override fun parseAndSet(input: String) {
-        set(parsingService.parse(input))
+        value = parsingService.parse(input)
     }
 
     override fun valueToString(value: T): String {
@@ -31,13 +32,14 @@ class EnumProperty<T : Enum<T>> internal constructor(
     companion object {
 
         fun <T : Enum<T>> from(name: String, value: T): EnumProperty<T> {
-            return from(name, value, Function { EnumParsingService.standard(it) })
+            return from(name, value, EnumParsingService.Companion::standard)
         }
 
-        fun <T : Enum<T>> from(name: String, value: T, parsingServiceCreator: Function<Class<T>, EnumParsingService<T>>): EnumProperty<T> {
+        fun <T : Enum<T>> from(name: String, value: T,
+                               parsingServiceCreator: (Class<T>) -> EnumParsingService<T>): EnumProperty<T> {
 
             val enumClass = value.declaringClass
-            val parsingService = parsingServiceCreator.apply(enumClass)
+            val parsingService = parsingServiceCreator(enumClass)
 
             return EnumProperty(name, value, parsingService)
         }

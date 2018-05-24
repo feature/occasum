@@ -14,7 +14,5 @@ internal class FolderPropertyNode(factory: PropertyNodeFactory,
     override val name: String = Named.validateName(name)
     override val id: String = Named.createIdFromName(name)
 
-    override val property: Property
-        get() = throw IllegalStateException("folder nodes cannot have a property")
-
+    override val property: Property<*>? = null
 }

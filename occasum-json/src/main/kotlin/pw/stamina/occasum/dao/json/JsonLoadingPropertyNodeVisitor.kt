@@ -9,8 +9,8 @@ import java.util.*
 
 internal class JsonLoadingPropertyNodeVisitor private constructor(
         private val element: JsonElement,
-        private val exceptions: MutableList<Exception>)
-    : AbstractPropertyNodeVisitor() {
+        private val exceptions: MutableList<Exception>
+) : PropertyNodeVisitor {
 
     constructor(element: JsonElement) : this(element, ArrayList<Exception>())
 
@@ -44,7 +44,7 @@ internal class JsonLoadingPropertyNodeVisitor private constructor(
         return Optional.empty()
     }
 
-    override fun createChildVisitor(childNode: PropertyNode): PropertyNodeVisitor? {
+    override fun visitChildNode(childNode: PropertyNode): PropertyNodeVisitor? {
         if (!element.isJsonObject) {
             return null
         }

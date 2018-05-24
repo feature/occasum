@@ -8,9 +8,9 @@ import pw.stamina.occasum.properties.Property
 
 import java.lang.reflect.Type
 
-internal class PropertyJsonSerializer : JsonSerializer<Property> {
+internal class PropertyJsonSerializer : JsonSerializer<Property<*>> {
 
-    override fun serialize(property: Property, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+    override fun serialize(property: Property<*>, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
         return JsonPrimitive(property.valueAsString)
     }
 }
